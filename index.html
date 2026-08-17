@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數數木 - 學習四則運算(加/減)</title>
+    <style>
+        :root {
+            --primary-color: #ffeb3b;
+            --secondary-color: #4caf50;
+            --bg-color: #e3f2fd;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "微軟正黑體";
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #game-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            border: 5px solid var(--secondary-color);
+        }
+
+        h1 { color: var(--secondary-color); margin-bottom: 10px; }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        #question {
+            font-size: 3rem;
+            margin: 20px 0;
+            color: var(--text-color);
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            background-color: #81c784;
+            color: white;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        button:hover { background-color: #66bb6a; transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+
+        #message {
+            margin-top: 20px;
+            height: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .correct { color: #4caf50; animation: bounce 0.5s; }
+        .wrong { color: #f44336; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>🌲 魔法數字森林 數數木</h1>
+    <div class="stats">
+        <span>分數: <span id="score">0</span></span>
+        <span>等級: <span id="level">1</span></span>
+    </div>
+    
+    <div id="question">? + ? = ?</div>
+    
+    <div class="options-grid">
+        <button onclick="checkAnswer(this)">--</button>
+        <button onclick="checkAnswer(this)">--</button>
+        <button onclick="checkAnswer(this)">--</button>
+        <button onclick="checkAnswer(this)">--</button>
+    </div>
+
+    <div id="message">準備好接受挑戰了嗎？</div>
+</div>
+
+<script>
+    let score = 0;
+    let level = 1;
+    let correctAnswer;
+
+    function generateQuestion() {
+        const msg = document.getElementById('message');
+        msg.className = '';
+        
+        let num1, num2, operator;
+        const rand = Math.random();
+
+        // 根據等級調整難度
+        if (level < 3) { // 基本加減法 (小三初階)
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * 10) + 1;
+            operator = rand > 0.5 ? '+' : '-';
+            if (operator === '-' && num1 < num2) [num1, num2] = [num2, num1];
+        } else { 
+            num1 = Math.floor(Math.random() * 20) + 1;
+            num2 = Math.floor(Math.random() * 20) + 1;
+            operator = rand > 0.5 ? '+' : '-';
+            if (operator === '-' && num1 < num2) [num1, num2] = [num2, num1];
+        }
+
+        correctAnswer = operator === '+' ? num1 + num2 : 
+                        operator === '-' ? num1 - num2 : num1 * num2;
+
+        document.getElementById('question').innerText = `${num1} ${operator} ${num2} = ?`;
+
+        // 生成選項
+        let options = [correctAnswer];
+        while(options.length < 4) {
+            let wrong = correctAnswer + (Math.floor(Math.random() * 20) - 10);
+            if(wrong !== correctAnswer && wrong > 0 && !options.includes(wrong)) {
+                options.push(wrong);
+            }
+        }
+        
+        // 洗牌選項
+        options.sort(() => Math.random() - 0.5);
+
+        const buttons = document.querySelectorAll('.options-grid button');
+        buttons.forEach((btn, index) => {
+            btn.innerText = options[index];
+            btn.style.backgroundColor = '#81c784';
+        });
+    }
+
+    function checkAnswer(btn) {
+        const selected = parseInt(btn.innerText);
+        const msg = document.getElementById('message');
+
+        if (selected === correctAnswer) {
+            score += 10;
+            if (score % 50 === 0) level++;
+            msg.innerText = "✨ 太棒了！你答對了！";
+            msg.className = 'correct';
+            document.getElementById('score').innerText = score;
+            document.getElementById('level').innerText = level;
+            
+            setTimeout(generateQuestion, 1000);
+        } else {
+            msg.innerText = "❌ 再試一次看看？";
+            msg.className = 'wrong';
+            btn.style.backgroundColor = '#ef9a9a';
+        }
+    }
+
+    // 初始化遊戲
+    generateQuestion();
+</script>
+
+</body>
+</html>
