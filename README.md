@@ -1,5 +1,5 @@
 # Mathwood
-數數木 - 學習四則運算(加/減)
+[數數木 - 學習四則運算(加/減)](https://zh-hant.github.io/Mathwood/)
 
 ## ⚖️ 免責聲明與 AI 輔助說明 | Disclaimer & AI-Assisted Development Disclosure
 
